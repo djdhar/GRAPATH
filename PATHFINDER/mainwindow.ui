@@ -176,7 +176,7 @@ HashMap)</string>
    <widget class="QRadioButton" name="dfs">
     <property name="geometry">
      <rect>
-      <x>1650</x>
+      <x>1610</x>
       <y>360</y>
       <width>201</width>
       <height>31</height>
@@ -189,7 +189,7 @@ HashMap)</string>
    <widget class="QRadioButton" name="bfs">
     <property name="geometry">
      <rect>
-      <x>1650</x>
+      <x>1610</x>
       <y>400</y>
       <width>161</width>
       <height>21</height>
@@ -202,8 +202,8 @@ HashMap)</string>
    <widget class="QPushButton" name="pushButton_6">
     <property name="geometry">
      <rect>
-      <x>1650</x>
-      <y>480</y>
+      <x>1640</x>
+      <y>540</y>
       <width>211</width>
       <height>61</height>
      </rect>
@@ -215,7 +215,7 @@ HashMap)</string>
    <widget class="QRadioButton" name="djktr">
     <property name="geometry">
      <rect>
-      <x>1650</x>
+      <x>1610</x>
       <y>430</y>
       <width>261</width>
       <height>23</height>
@@ -249,6 +249,32 @@ HashMap)</string>
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="bellmanford">
+    <property name="geometry">
+     <rect>
+      <x>1610</x>
+      <y>460</y>
+      <width>291</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Bellman Ford Shortest Path Algorithm</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="floyd">
+    <property name="geometry">
+     <rect>
+      <x>1610</x>
+      <y>490</y>
+      <width>291</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Floyd Warshall Shortest Path Algorithm</string>
     </property>
    </widget>
   </widget>

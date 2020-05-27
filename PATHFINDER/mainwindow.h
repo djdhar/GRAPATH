@@ -44,8 +44,10 @@ private slots:
     bool DJKTR(int,int,int&);
     bool RunDJKTR(int,int,int&);
     bool Dijkstra(int,int);
+    bool BellManFord();
     bool RatInAMazeHashMap(int x, int y);
     void ClearTraversalPath();
+    bool FloydWarshall();
     void on_pushButton_4_clicked();
 
     void on_pushButton_5_clicked();

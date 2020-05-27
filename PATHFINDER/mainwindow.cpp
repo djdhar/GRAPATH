@@ -576,6 +576,213 @@ void MainWindow::on_pushButton_6_clicked()
         RunDJKTR(StartNode.first,StartNode.second,found);
         cout<<"djktr"<<endl;
     }
+    if(ui->bellmanford->isChecked()){
+        BellManFord();
+    }
+    if(ui->floyd->isChecked()){
+        FloydWarshall();
+    }
+}
+bool MainWindow::FloydWarshall(){
+    QMap<int,QPair<int,int>> map;
+    QMap<QPair<int,int>,int> revmap;
+    int p=0;
+    for(int i=pixelsize/2;i<width_of_the_frame;i=i+pixelsize){
+        for(int j=pixelsize/2;j<height_of_the_frame;j=j+pixelsize){
+            map[p]=qMakePair(i,j);
+            revmap[qMakePair(i,j)]=p;
+            p++;
+        }
+    }
+
+    int dist[map.size()][map.size()];
+    int next[map.size()][map.size()];
+
+    for(int i=0;i<map.size();i++){
+        for(int j=0;j<map.size();j++){
+            dist[i][j]=INT_MAX;
+            next[i][j]=INT_MAX;
+        }
+    }
+    for(int i=0;i<map.size();i++){
+        QPair<int,int> vertex =map[i];
+        int x=vertex.first;
+        int y=vertex.second;
+        if(isValid(x+pixelsize,y) ){
+            if(sourceImage.pixelColor(x+pixelsize,y)!= QColor(0,255,0)){
+            dist[i][revmap[qMakePair(x+pixelsize,y)]]=1;
+            next[i][revmap[qMakePair(x+pixelsize,y)]]=revmap[qMakePair(x+pixelsize,y)];
+        }
+        }
+        if(isValid(x-pixelsize,y)){
+            if(sourceImage.pixelColor(x-pixelsize,y)!= QColor(0,255,0)){
+            dist[i][revmap[qMakePair(x-pixelsize,y)]]=1;
+            next[i][revmap[qMakePair(x-pixelsize,y)]]=revmap[qMakePair(x-pixelsize,y)];
+        }
+        }
+        if(isValid(x,y+pixelsize)){
+            if(sourceImage.pixelColor(x,y+pixelsize)!= QColor(0,255,0)){
+            dist[i][revmap[qMakePair(x,y+pixelsize)]]=1;
+            next[i][revmap[qMakePair(x,y+pixelsize)]]=revmap[qMakePair(x,y+pixelsize)];
+        }
+        }
+        if(isValid(x,y-pixelsize)){
+            if(sourceImage.pixelColor(x,y-pixelsize)!= QColor(0,255,0)){
+            dist[i][revmap[qMakePair(x,y-pixelsize)]]=1;
+            next[i][revmap[qMakePair(x,y-pixelsize)]]=revmap[qMakePair(x,y-pixelsize)];
+        }
+        }
+        dist[i][i]=0;
+        next[i][i]=i;
+    }
+
+    int gg=0;
+    int N = (height_of_the_frame/pixelsize)*(width_of_the_frame/pixelsize);;
+        for(int k=0;k<N;k++){
+            int x=map[k].first, y=map[k].second;
+            for(int i=0;i<N;i++){
+
+                for(int j=0;j<N;j++){
+                    if((long)dist[i][j]>(long)dist[i][k]+(long)dist[k][j]){
+                        dist[i][j]=dist[i][k]+dist[k][j];
+                        //point(sourceImage,x,y,2); delay(DELAYTIME);
+                        cout<<gg<<endl;
+                        gg++;
+                        next[i][j]=next[i][k];
+                    }
+                }
+            }
+            if(sourceImage.pixelColor(x,y)!=QColor(0,255,0) && map[k]!=StartNode && map[k]!=EndNode)
+                point(sourceImage,x,y,2); delay(DELAYTIME);
+        }
+
+        int u = revmap[StartNode];
+        int v = revmap[EndNode];
+        if(next[u][v]==INT_MAX)
+            return false;
+        if(dist[u][v]==INT_MAX)
+            return false;
+        int g=0;
+        while(u!=v){
+            g++;
+            u=next[u][v];
+            int x= map[u].first;
+            int y = map[u].second;
+            if(map[u]!=EndNode){
+               point(sourceImage,x,y,2,246,170,85); delay(DELAYTIME);
+            }
+            if(g==900)
+                break;
+        }
+    return true;
+}
+bool MainWindow::BellManFord(){
+
+    QVector <QPair<QPair<int,int>,int>> M;
+    QMap<int,QPair<int,int>> map;
+    QMap<QPair<int,int>,int> revmap;
+    int p=0;
+    for(int i=pixelsize/2;i<width_of_the_frame;i=i+pixelsize){
+
+        for(int j=pixelsize/2;j<height_of_the_frame;j=j+pixelsize){
+            if(qMakePair(i,j)==EndNode){
+                M.push_back(qMakePair(qMakePair(i,j),0));
+            }
+            else {
+                M.push_back(qMakePair(qMakePair(-1,-1),INT_MAX));
+            }
+            map[p]=qMakePair(i,j);
+            revmap[qMakePair(i,j)]=p;
+
+            p++;
+        }
+    }
+    cout<<"foo"<<endl;
+    int total_itr =(height_of_the_frame/pixelsize)*(width_of_the_frame/pixelsize);
+  cout<<"total itr ="<<total_itr<<" "<<map.size()<<endl;
+   while(total_itr--){
+       for(int i=0;i<map.size();i++){
+           int x= map[i].first;
+           int y = map[i].second;
+           if(sourceImage.pixelColor(x,y)==QColor(0,255,0)){
+               continue;
+           }
+           QPair<QPair<int,int>,int> det = qMakePair(qMakePair(-1,-1),INT_MAX);
+           if(isValid(x-pixelsize,y) ){
+               if(sourceImage.pixelColor(x-pixelsize,y)!=QColor(0,255,0)){
+               if( M[revmap[qMakePair(x-pixelsize,y)]].first != qMakePair(-1,-1)){
+                   if((long)M[revmap[qMakePair(x-pixelsize,y)]].second+(long)1<(long)det.second){
+                       det.second=M[revmap[qMakePair(x-pixelsize,y)]].second+1;
+                       det.first=qMakePair(x-pixelsize,y);
+                   }
+               }
+                }
+           }
+
+           if(isValid(x+pixelsize,y) ){
+               if(sourceImage.pixelColor(x+pixelsize,y)!=QColor(0,255,0)){
+               if( M[revmap[qMakePair(x+pixelsize,y)]].first != qMakePair(-1,-1)){
+                   if((long)M[revmap[qMakePair(x+pixelsize,y)]].second+(long)1<(long)det.second){
+                       det.second=M[revmap[qMakePair(x+pixelsize,y)]].second+1;
+                       det.first=qMakePair(x+pixelsize,y);
+                   }
+               }
+               }
+           }
+
+           if(isValid(x,y+pixelsize) ){
+               if(sourceImage.pixelColor(x,y+pixelsize)!=QColor(0,255,0)){
+               if( M[revmap[qMakePair(x,y+pixelsize)]].first != qMakePair(-1,-1)){
+                   if((long)M[revmap[qMakePair(x,y+pixelsize)]].second+(long)1<(long)det.second){
+                       det.second=M[revmap[qMakePair(x,y+pixelsize)]].second+1;
+                       det.first=qMakePair(x,y+pixelsize);
+                   }
+               }
+               }
+           }
+
+           if(isValid(x,y-pixelsize) ){
+               if(sourceImage.pixelColor(x,y-pixelsize)!=QColor(0,255,0)){
+               if( M[revmap[qMakePair(x,y-pixelsize)]].first != qMakePair(-1,-1)){
+                   if((long)M[revmap[qMakePair(x,y-pixelsize)]].second+(long)1<(long)det.second){
+                       det.second=M[revmap[qMakePair(x,y-pixelsize)]].second+1;
+                       det.first=qMakePair(x,y-pixelsize);
+                   }
+               }
+               }
+           }
+
+           if(det.first!=qMakePair(-1,-1) && det.second<M[i].second){
+               M[i]=det;
+               if(qMakePair(x,y)!=StartNode && qMakePair(x,y)!=EndNode)
+                point(sourceImage,x,y,2); delay(DELAYTIME);
+           }
+       }
+   }
+    bool found=false;
+
+       int x=revmap[StartNode];
+        int g=0;
+       QPair<QPair<int,int>,int> det = M[x];
+       while(det.first!=qMakePair(-1,-1)){
+           g++;
+           //cout<<"X = "<<det.first.first<<" Y = "<<det.first.second<<endl;
+           if(det.first!=StartNode && det.first!=EndNode)
+                point(sourceImage,det.first.first,det.first.second,2,246,170,85);
+           delay(DELAYTIME);
+           if(det.first==EndNode){
+               found=true;
+               break;
+           }
+           /*
+           if(g==900)
+               break;
+           */
+           det=M[revmap[det.first]];
+       }
+
+
+   return found;
 }
 bool MainWindow::RunDJKTR(int x,int y, int &found){
         Parent.clear();
